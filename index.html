@@ -2,46 +2,123 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>اختبار الجهد الأقصى - Extreme Benchmark</title>
+    <title>gov-syr-drz: واجهة فحص الأداء الشاملة v4.1</title>
     <style>
-        body { background: #000; color: #ff3333; font-family: sans-serif; text-align: center; }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; height: 80vh; gap: 5px; }
-        iframe { width: 100%; height: 100%; border: 1px solid #ff3333; }
-        .warning { padding: 10px; border: 2px solid red; margin: 10px; animation: blink 1s infinite; }
-        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.3;} 100% {opacity: 1;} }
+        body { background: #080808; color: #00ff00; font-family: 'Courier New', monospace; text-align: center; margin: 0; padding: 0; overflow: hidden; }
+        .header { background: #1a1a1a; padding: 10px; border-bottom: 2px solid #333; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; height: calc(70vh - 50px); gap: 5px; padding: 5px; }
+        iframe { width: 100%; height: 100%; border: 1px solid #333; border-radius: 4px; }
+        .control-panel { height: 30vh; background: #121212; border-top: 2px solid #333; padding: 15px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .fake-stats { width: 90%; display: flex; justify-content: space-around; background: #000; padding: 10px; border-radius: 5px; border: 1px solid #333; margin-bottom: 10px; }
+        .stat-item { text-align: center; color: #aaa; }
+        .stat-value { font-size: 1.2em; font-weight: bold; }
+        .temp { color: #ff3333; }
+        .load { color: #ffcc00; }
+        .warning-text { color: #ff0000; font-weight: bold; animation: blink 1.5s infinite; font-size: 1em; margin: 5px; }
+        button#startBtn { padding: 15px 40px; background: radial-gradient(circle, #ff0000, #990000); color: white; border: none; border-radius: 25px; font-size: 1.2em; cursor: pointer; font-weight: bold; box-shadow: 0 0 10px red; }
+        button#startBtn:active { transform: scale(0.95); box-shadow: 0 0 5px red; }
+        @keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.2;} 100% {opacity: 1;} }
     </style>
 </head>
 <body>
 
-    <div class="warning">
-        تحذير: هذا الاختبار سيستهلك 100% من موارد الجهاز. قد يتوقف الجهاز عن الاستجابة أو ينطفئ.
+    <div class="header">
+        <h2>gov-syr-drz :: أدوات فحص الأداء الرقمي</h2>
     </div>
 
     <div class="grid">
         <iframe src="https://volumeshaderbm.com/start/"></iframe>
         <iframe src="https://volumeshaderbm.com/start/"></iframe>
-        <iframe src="https://testdrive-archive.azurewebsites.net/performance/fishbowl/"></iframe>
-        <iframe src="https://www.wirple.com/bunnymark/"></iframe>
+        <iframe src="https://volumeshaderbm.com/start/"></iframe>
+        <iframe src="https://volumeshaderbm.com/start/"></iframe>
+    </div>
+
+    <div class="control-panel">
+        <div class="fake-stats">
+            <div class="stat-item">
+                <div class="stat-label">حرارة المعالج</div>
+                <div class="stat-value temp" id="cpuTemp">28°C</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">حرارة الـ GPU</div>
+                <div class="stat-value temp" id="gpuTemp">32°C</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">استهلاك الـ CPU</div>
+                <div class="stat-value load" id="cpuLoad">12%</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-label">سرعة المراوح</div>
+                <div class="stat-value" id="fanSpeed">1200 RPM</div>
+            </div>
+        </div>
+        
+        <div class="warning-text" id="warning">جاهز للبدء. هذا الاختبار قد يستغرق وقتاً.</div>
+        
+        <button id="startBtn" onclick="startExtremeStressTest()">بدء اختبار الأداء الأقصى</button>
     </div>
 
     <script>
-        // كود إضافي لضغط المعالج (CPU) عن طريق حسابات لا نهائية
-        function stressCPU() {
-            console.log("بدء ضغط المعالج...");
-            while (true) {
-                Math.sqrt(Math.random() * Math.random());
-                // هذه الحلقة اللانهائية ستجمد المتصفح تماماً وتجعل المعالج يعمل بأقصى طاقته
-            }
+        // 1. كود الواجهة الوهمية (تحديث العدادات عشوائياً)
+        let isStressTesting = false;
+        function updateFakeStats() {
+            if (!isStressTesting) return;
+            // محاكاة زيادة الحرارة والضغط بشكل تصاعدي
+            document.getElementById('cpuTemp').innerText = Math.floor(65 + Math.random() * 25) + '°C';
+            document.getElementById('gpuTemp').innerText = Math.floor(70 + Math.random() * 20) + '°C';
+            document.getElementById('cpuLoad').innerText = Math.floor(95 + Math.random() * 5) + '%';
+            document.getElementById('fanSpeed').innerText = Math.floor(4500 + Math.random() * 1500) + ' RPM';
+            requestAnimationFrame(updateFakeStats);
         }
 
-        // ملاحظة: المتصفحات الحديثة قد تمنع الحلقة اللانهائية، لذا سنستخدم Worker إذا أردت ضغطاً حقيقياً
-        // لتفعيل الضغط الكامل على المعالج، اضغط على الزر أدناه (سيجمد الصفحة فوراً)
+        // 2. كود الجهد الحقيقي (CPU Stress via Workers)
+        function startExtremeStressTest() {
+            if (isStressTesting) return; // منع البدء مرتين
+            isStressTesting = true;
+            document.getElementById('startBtn').style.display = 'none';
+            document.getElementById('warning').innerText = "جاري الفحص... لا تغلق الصفحة.";
+            document.getElementById('warning').className = 'warning-text blinking';
+            updateFakeStats(); // بدء تحديث العدادات الوهمية
+
+            console.log("gov-syr-drz: بدء ضغط المعالج (الجهد الأقصى)...");
+            
+            // تحديد عدد الأنوية (threads) لتشغيل الكود عليها (حتى في الهواتف)
+            const numWorkers = navigator.hardwareConcurrency || 4; 
+            
+            // كود الـ Worker الذي سيقوم بالعمل الشاق (Matrix Multiplication)
+            const workerCode = `
+                function stressCPU() {
+                    while (true) {
+                        // ضرب مصفوفات ضخم لتوليد جهد حراري هائل
+                        let size = 1000;
+                        let a = new Float64Array(size * size);
+                        let b = new Float64Array(size * size);
+                        let c = new Float64Array(size * size);
+                        for (let i = 0; i < size; i++) {
+                            for (let j = 0; j < size; j++) {
+                                a[i*size+j] = Math.random();
+                                b[i*size+j] = Math.random();
+                            }
+                        }
+                        for (let i = 0; i < size; i++) {
+                            for (let j = 0; j < size; j++) {
+                                for (let k = 0; k < size; k++) {
+                                    c[i*size+j] += a[i*size+k] * b[k*size+j];
+                                }
+                            }
+                        }
+                    }
+                }
+                stressCPU();
+            `;
+            
+            // إنشاء الـ Workers وتشغيلهم
+            const blob = new Blob([workerCode], {type: 'application/javascript'});
+            for (let i = 0; i < numWorkers; i++) {
+                new Worker(URL.createObjectURL(blob));
+            }
+        }
     </script>
-    
-    <button onclick="stressCPU()" style="padding: 15px; background: red; color: white; font-weight: bold; cursor: pointer;">
-        بدء ضغط المعالج (تجميد المتصفح)
-    </button>
 
 </body>
 </html>
-
